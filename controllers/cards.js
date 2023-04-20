@@ -44,7 +44,7 @@ const deleteCard = (req, res) => {
       if (e.message === 'Not found') {
         res.status(404).send({ message: 'Card not found' });
       } else {
-        res.status(500).send({ message: 'Smth went wrong' });
+        res.status(400).send({ message: 'Smth went wrong' });
       }
     });
 };
@@ -65,7 +65,7 @@ const likeCard = (req, res) => {
       if (e.message === 'Not found') {
         res.status(404).send({ message: 'Card not found' });
       } else {
-        res.status(500).send({ message: 'Smth went wrong' });
+        res.status(400).send({ message: 'Smth went wrong' });
       }
     });
 };
@@ -86,7 +86,7 @@ const dislikeCard = (req, res) => {
       if (e.message === 'Not found') {
         res.status(404).send({ message: 'Card not found' });
       } else {
-        res.status(500).send({ message: 'Smth went wrong' });
+        res.status(400).send({ message: 'Smth went wrong' });
       }
     });
 };
