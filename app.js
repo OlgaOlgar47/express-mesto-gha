@@ -1,14 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-const {
-  PORT,
-  CONNECT,
-  DEFAULT_ERROR_MESSAGE,
-  STATUS_NOT_FOUND,
-} = require('./config');
+const { PORT, DEFAULT_ERROR_MESSAGE, STATUS_NOT_FOUND } = require('./config');
 
-mongoose.connect(CONNECT);
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 const app = express();
 
