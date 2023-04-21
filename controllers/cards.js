@@ -1,4 +1,10 @@
 const Card = require('../models/cards');
+const {
+  STATUS_BAD_REQUEST,
+  STATUS_NOT_FOUND,
+  STATUS_INTERNAL_SERVER_ERROR,
+  DEFAULT_ERROR_MESSAGE,
+} = require('../config');
 
 const getCards = (req, res) => {
   Card.find({}, { __v: 0 })
@@ -6,7 +12,9 @@ const getCards = (req, res) => {
       res.send({ data: cards });
     })
     .catch(() => {
-      res.status(500).send({ message: 'smth went wrong' });
+      res
+        .status(STATUS_INTERNAL_SERVER_ERROR)
+        .send({ message: DEFAULT_ERROR_MESSAGE });
     });
 };
 
@@ -19,14 +27,15 @@ const createCard = (req, res) => {
       res.status(201).send({ data: card });
     })
     .catch((e) => {
-      console.log('e => ', e);
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
-      if (e.name == 'ValidationError') {
-        res.status(400).send({ message });
+      if (e.name === 'ValidationError') {
+        res.status(STATUS_BAD_REQUEST).send({ message });
       } else {
-        res.status(500).send({ message: 'Smth went wrong' });
+        res
+          .status(STATUS_INTERNAL_SERVER_ERROR)
+          .send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -40,11 +49,10 @@ const deleteCard = (req, res) => {
     })
     .then((card) => res.send({ deletedData: card }))
     .catch((e) => {
-      console.log('e => ', e);
       if (e.message === 'Not found') {
-        res.status(404).send({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
       } else {
-        res.status(400).send({ message: 'Smth went wrong' });
+        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -63,9 +71,9 @@ const likeCard = (req, res) => {
     })
     .catch((e) => {
       if (e.message === 'Not found') {
-        res.status(404).send({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
       } else {
-        res.status(400).send({ message: 'Smth went wrong' });
+        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -84,9 +92,9 @@ const dislikeCard = (req, res) => {
     })
     .catch((e) => {
       if (e.message === 'Not found') {
-        res.status(404).send({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
       } else {
-        res.status(400).send({ message: 'Smth went wrong' });
+        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };

@@ -1,4 +1,10 @@
 const User = require('../models/users');
+const {
+  STATUS_BAD_REQUEST,
+  STATUS_NOT_FOUND,
+  STATUS_INTERNAL_SERVER_ERROR,
+  DEFAULT_ERROR_MESSAGE,
+} = require('../config');
 
 const getUsers = (req, res) => {
   User.find()
@@ -6,7 +12,9 @@ const getUsers = (req, res) => {
       res.send({ data: users });
     })
     .catch(() => {
-      res.status(500).send({ message: 'smth went wrong' });
+      res
+        .status(STATUS_INTERNAL_SERVER_ERROR)
+        .send({ message: DEFAULT_ERROR_MESSAGE });
     });
 };
 
@@ -21,11 +29,10 @@ const getUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((e) => {
-      console.log('e => ', e);
       if (e.message === 'Not found') {
-        res.status(404).send({ message: 'User not found' });
+        res.status(STATUS_NOT_FOUND).send({ message: 'User not found' });
       } else {
-        res.status(400).send({ message: 'Smth went wrong' });
+        res.status(STATUS_BAD_REQUEST).send({ DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -38,14 +45,15 @@ const createUser = (req, res) => {
       res.status(201).send({ data: user });
     })
     .catch((e) => {
-      console.log('e => ', e);
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
-      if (e.name == 'ValidationError') {
-        res.status(400).send({ message });
+      if (e.name === 'ValidationError') {
+        res.status(STATUS_BAD_REQUEST).send({ message });
       } else {
-        res.status(500).send({ message: 'Smth went wrong' });
+        res
+          .status(STATUS_INTERNAL_SERVER_ERROR)
+          .send({ DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -68,16 +76,17 @@ const updateUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((e) => {
-      console.log('e => ', e);
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
       if (e.message === 'Not found') {
-        res.status(404).send({ message: 'User not found' });
-      } else if (e.name == 'ValidationError') {
-        res.status(400).send({ message });
+        res.status(STATUS_NOT_FOUND).send({ message: 'User not found' });
+      } else if (e.name === 'ValidationError') {
+        res.status(STATUS_BAD_REQUEST).send({ message });
       } else {
-        res.status(500).send({ message: 'Smth went wrong' });
+        res
+          .status(STATUS_INTERNAL_SERVER_ERROR)
+          .send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -100,16 +109,17 @@ const updateAvatar = (req, res) => {
       res.send({ data: user });
     })
     .catch((e) => {
-      console.log('e => ', e);
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
       if (e.message === 'Not found') {
-        res.status(404).send({ message: 'User not found' });
-      } else if (e.name == 'ValidationError') {
-        res.status(400).send({ message });
+        res.status(STATUS_NOT_FOUND).send({ message: 'User not found' });
+      } else if (e.name === 'ValidationError') {
+        res.status(STATUS_BAD_REQUEST).send({ message });
       } else {
-        res.status(500).send({ message: 'Smth went wrong' });
+        res
+          .status(STATUS_INTERNAL_SERVER_ERROR)
+          .send({ DEFAULT_ERROR_MESSAGE });
       }
     });
 };

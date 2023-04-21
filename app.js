@@ -1,14 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+const {
+  PORT,
+  CONNECT,
+  DEFAULT_ERROR_MESSAGE,
+  STATUS_NOT_FOUND,
+} = require('./config');
+
+mongoose.connect(CONNECT);
 
 const app = express();
 
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-
-const { PORT = 3000 } = process.env;
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -21,7 +26,7 @@ app.use((req, res, next) => {
 app.use(userRouter);
 app.use(cardRouter);
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Page is not found' });
+  res.status(STATUS_NOT_FOUND).send({ message: DEFAULT_ERROR_MESSAGE });
 });
 
 app.listen(PORT, () => {
