@@ -32,7 +32,7 @@ const getUser = (req, res) => {
       if (e.message === 'Not found') {
         res.status(STATUS_NOT_FOUND).send({ message: 'User not found' });
       } else {
-        res.status(STATUS_BAD_REQUEST).send({ DEFAULT_ERROR_MESSAGE });
+        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -53,7 +53,7 @@ const createUser = (req, res) => {
       } else {
         res
           .status(STATUS_INTERNAL_SERVER_ERROR)
-          .send({ DEFAULT_ERROR_MESSAGE });
+          .send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -119,7 +119,7 @@ const updateAvatar = (req, res) => {
       } else {
         res
           .status(STATUS_INTERNAL_SERVER_ERROR)
-          .send({ DEFAULT_ERROR_MESSAGE });
+          .send({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
