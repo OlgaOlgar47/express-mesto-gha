@@ -1,12 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-const {
-  PORT,
-  DEFAULT_ERROR_MESSAGE,
-  STATUS_NOT_FOUND,
-  DATABASE_URL,
-} = require('./config');
+const { DATABASE_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
+const { PORT, DEFAULT_ERROR_MESSAGE, STATUS_NOT_FOUND } = require('./config');
 
 mongoose.connect(DATABASE_URL);
 
