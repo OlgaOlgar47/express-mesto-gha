@@ -16,7 +16,9 @@ cardRouter.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(8),
-      link: Joi.string().required().url(),
+      link: Joi.string().pattern(
+        /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?#?$/
+      ),
     }),
   }),
   createCard
