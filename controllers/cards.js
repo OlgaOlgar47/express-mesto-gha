@@ -43,14 +43,14 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
 
-  Card.findByIdAndRemove(cardId)
+  Card.findOneAndRemove({ _id: cardId, owner: req.user._id })
     .orFail(() => {
-      throw new Error('Not found');
+      throw new Error('Not allowed');
     })
     .then((card) => res.send({ deletedData: card }))
     .catch((e) => {
-      if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
+      if (e.message === 'Not allowed') {
+        res.status(STATUS_NOT_FOUND).send({ message: 'Not allowed' });
       } else {
         res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
       }

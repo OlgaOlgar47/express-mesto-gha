@@ -1,10 +1,64 @@
+/* eslint-disable consistent-return */
+/* eslint-disable function-paren-newline */
+/* eslint-disable implicit-arrow-linebreak */
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 const {
+  SECRET_KEY,
   STATUS_BAD_REQUEST,
+  STATUS_UNAUTHORIZED,
   STATUS_NOT_FOUND,
   STATUS_INTERNAL_SERVER_ERROR,
   DEFAULT_ERROR_MESSAGE,
 } = require('../config');
+
+const login = (req, res) => {
+  if (!req.body) {
+    res.status(STATUS_BAD_REQUEST).send({ message: 'invalid body request' });
+    return;
+  }
+
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(
+      STATUS_BAD_REQUEST.send({ message: 'email or password is required' })
+    );
+    return;
+  }
+
+  User.findUserByCredentials(email, password)
+    .then(() => {
+      const token = jwt.sign({ _id: 'd285e3dceed844f902650f40' }, SECRET_KEY, {
+        expiresIn: '7d',
+      });
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        sameSite: true,
+      }); // httpOnly кука с токеном
+      res.send({ message: 'Login successful!' });
+    })
+    .catch(() => {
+      res.status(STATUS_UNAUTHORIZED).send({ message: 'Ошибка авторизации' });
+    });
+};
+
+const getUserMe = (req, res) => {
+  console.log('work');
+  const userId = req.user._id;
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      res.send({ data: user });
+    })
+    .catch(() => {
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
+};
 
 const getUsers = (req, res) => {
   User.find()
@@ -38,9 +92,31 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  if (!req.body) {
+    res.status(STATUS_BAD_REQUEST).send({ message: 'invalid body request' });
+    return;
+  }
+  // eslint-disable-next-line object-curly-newline
+  const { name, about, avatar, email, password } = req.body;
 
-  User.create({ name, about, avatar })
+  if (!email || !password) {
+    res.astatus(
+      STATUS_BAD_REQUEST.send({ message: 'email or password is required' })
+    );
+    return;
+  }
+
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+    )
     .then((user) => {
       res.status(201).send({ data: user });
     })
@@ -125,8 +201,10 @@ const updateAvatar = (req, res) => {
 };
 
 module.exports = {
+  login,
   getUser,
   getUsers,
+  getUserMe,
   createUser,
   updateUser,
   updateAvatar,
