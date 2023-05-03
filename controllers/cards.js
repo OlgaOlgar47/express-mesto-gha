@@ -9,12 +9,12 @@ const {
 const getCards = (req, res) => {
   Card.find({}, { __v: 0 })
     .then((cards) => {
-      res.send({ data: cards });
+      res.json({ data: cards });
     })
     .catch(() => {
       res
         .status(STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: DEFAULT_ERROR_MESSAGE });
+        .json({ message: DEFAULT_ERROR_MESSAGE });
     });
 };
 
@@ -24,18 +24,18 @@ const createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
       card.populate('owner');
-      res.status(201).send({ data: card });
+      res.status(201).json({ data: card });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
       if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).send({ message });
+        res.status(STATUS_BAD_REQUEST).json({ message });
       } else {
         res
           .status(STATUS_INTERNAL_SERVER_ERROR)
-          .send({ message: DEFAULT_ERROR_MESSAGE });
+          .json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -47,12 +47,12 @@ const deleteCard = (req, res) => {
     .orFail(() => {
       throw new Error('Not allowed');
     })
-    .then((card) => res.send({ deletedData: card }))
+    .then((card) => res.json({ deletedData: card }))
     .catch((e) => {
       if (e.message === 'Not allowed') {
-        res.status(STATUS_NOT_FOUND).send({ message: 'Not allowed' });
+        res.status(STATUS_NOT_FOUND).json({ message: 'Not allowed' });
       } else {
-        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
+        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -67,13 +67,13 @@ const likeCard = (req, res) => {
       throw new Error('Not found');
     })
     .then((card) => {
-      res.send({ data: card });
+      res.json({ data: card });
     })
     .catch((e) => {
       if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
       } else {
-        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
+        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -88,13 +88,13 @@ const dislikeCard = (req, res) => {
       throw new Error('Not found');
     })
     .then((card) => {
-      res.send({ data: card });
+      res.json({ data: card });
     })
     .catch((e) => {
       if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
       } else {
-        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
+        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };

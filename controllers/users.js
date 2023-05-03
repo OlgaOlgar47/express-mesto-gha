@@ -15,7 +15,7 @@ const {
 
 const login = (req, res) => {
   if (!req.body) {
-    res.status(STATUS_BAD_REQUEST).send({ message: 'invalid body request' });
+    res.status(STATUS_BAD_REQUEST).json({ message: 'invalid body request' });
     return;
   }
 
@@ -23,7 +23,7 @@ const login = (req, res) => {
 
   if (!email || !password) {
     res.status(
-      STATUS_BAD_REQUEST.send({ message: 'email or password is required' })
+      STATUS_BAD_REQUEST.json({ message: 'email or password is required' })
     );
     return;
   }
@@ -38,10 +38,10 @@ const login = (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         sameSite: true,
       }); // httpOnly кука с токеном
-      res.send({ message: 'Login successful!' });
+      res.json({ message: 'Login successful!' });
     })
     .catch(() => {
-      res.status(STATUS_UNAUTHORIZED).send({ message: 'Ошибка авторизации' });
+      res.status(STATUS_UNAUTHORIZED).json({ message: 'Ошибка авторизации' });
     });
 };
 
@@ -51,24 +51,24 @@ const getUserMe = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return res.status(404).json({ message: 'Пользователь не найден' });
       }
-      res.send({ data: user });
+      res.json({ data: user });
     })
     .catch(() => {
-      res.status(500).send({ message: 'Ошибка сервера' });
+      res.status(500).json({ message: 'Ошибка сервера' });
     });
 };
 
 const getUsers = (req, res) => {
   User.find()
     .then((users) => {
-      res.send({ data: users });
+      res.json({ data: users });
     })
     .catch(() => {
       res
         .status(STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: DEFAULT_ERROR_MESSAGE });
+        .json({ message: DEFAULT_ERROR_MESSAGE });
     });
 };
 
@@ -80,28 +80,28 @@ const getUser = (req, res) => {
       throw new Error('Not found');
     })
     .then((user) => {
-      res.send({ data: user });
+      res.json({ data: user });
     })
     .catch((e) => {
       if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).send({ message: 'User not found' });
+        res.status(STATUS_NOT_FOUND).json({ message: 'User not found' });
       } else {
-        res.status(STATUS_BAD_REQUEST).send({ message: DEFAULT_ERROR_MESSAGE });
+        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
 
 const createUser = (req, res) => {
   if (!req.body) {
-    res.status(STATUS_BAD_REQUEST).send({ message: 'invalid body request' });
+    res.status(STATUS_BAD_REQUEST).json({ message: 'invalid body request' });
     return;
   }
   // eslint-disable-next-line object-curly-newline
   const { name, about, avatar, email, password } = req.body;
 
   if (!email || !password) {
-    res.astatus(
-      STATUS_BAD_REQUEST.send({ message: 'email or password is required' })
+    res.status(
+      STATUS_BAD_REQUEST.json({ message: 'email or password is required' })
     );
     return;
   }
@@ -118,18 +118,18 @@ const createUser = (req, res) => {
       })
     )
     .then((user) => {
-      res.status(201).send({ data: user });
+      res.status(201).json({ data: user });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
       if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).send({ message });
+        res.status(STATUS_BAD_REQUEST).json({ message });
       } else {
         res
           .status(STATUS_INTERNAL_SERVER_ERROR)
-          .send({ message: DEFAULT_ERROR_MESSAGE });
+          .json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -149,20 +149,20 @@ const updateUser = (req, res) => {
       throw new Error('Not found');
     })
     .then((user) => {
-      res.send({ data: user });
+      res.json({ data: user });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
       if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).send({ message: 'User not found' });
+        res.status(STATUS_NOT_FOUND).json({ message: 'User not found' });
       } else if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).send({ message });
+        res.status(STATUS_BAD_REQUEST).json({ message });
       } else {
         res
           .status(STATUS_INTERNAL_SERVER_ERROR)
-          .send({ message: DEFAULT_ERROR_MESSAGE });
+          .json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };
@@ -182,20 +182,20 @@ const updateAvatar = (req, res) => {
       throw new Error('Not found');
     })
     .then((user) => {
-      res.send({ data: user });
+      res.json({ data: user });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
         .map((err) => err.message)
         .join('; ');
       if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).send({ message: 'User not found' });
+        res.status(STATUS_NOT_FOUND).json({ message: 'User not found' });
       } else if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).send({ message });
+        res.status(STATUS_BAD_REQUEST).json({ message });
       } else {
         res
           .status(STATUS_INTERNAL_SERVER_ERROR)
-          .send({ message: DEFAULT_ERROR_MESSAGE });
+          .json({ message: DEFAULT_ERROR_MESSAGE });
       }
     });
 };

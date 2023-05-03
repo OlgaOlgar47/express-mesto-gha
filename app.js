@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 
 const { DATABASE_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 const { PORT, STATUS_NOT_FOUND } = require('./config');
@@ -25,6 +26,11 @@ app.post(
     body: Joi.object().keys({
       email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().pattern(
+        /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?#?$/
+      ),
     }),
   }),
   login
@@ -39,6 +45,7 @@ app.post(
   }),
   createUser
 );
+app.use(errors());
 
 app.use(auth, userRouter);
 app.use(auth, cardRouter);
