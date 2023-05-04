@@ -1,5 +1,6 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 
 const {
   getUserMe,
@@ -16,7 +17,7 @@ userRouter.get('/users', getUsers);
 userRouter.get(
   '/users/:userId',
   celebrate({
-    body: Joi.object().keys({
+    params: Joi.object().keys({
       userId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
     }),
   }),
@@ -43,5 +44,7 @@ userRouter.patch(
   }),
   updateAvatar
 );
+
+userRouter.use(errors());
 
 module.exports = userRouter;
