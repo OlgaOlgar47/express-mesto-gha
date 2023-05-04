@@ -30,7 +30,6 @@ const login = (req, res) => {
   }
 
   User.findUserByCredentials(email, password)
-    .select('+password')
     .then(() => {
       const token = jwt.sign({ _id: 'd285e3dceed844f902650f40' }, SECRET_KEY, {
         expiresIn: '7d',

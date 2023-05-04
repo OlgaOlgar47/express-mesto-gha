@@ -52,19 +52,21 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   if (!isEmailValid) {
     return Promise.reject(new Error('Неправильные почта или пароль'));
   }
-  return this.findOne({ email }).then((user) => {
-    if (!user) {
-      return Promise.reject(new Error('Неправильные почта или пароль'));
-    }
-
-    return bcrypt.compare(password, user.password).then((matched) => {
-      if (!matched) {
+  return this.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
       }
 
-      return user; // теперь user доступен
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error('Неправильные почта или пароль'));
+        }
+
+        return user; // теперь user доступен
+      });
     });
-  });
 };
 
 module.exports = mongoose.model('User', userSchema);
