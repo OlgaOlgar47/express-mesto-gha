@@ -17,7 +17,7 @@ userRouter.get(
   '/users/:userId',
   celebrate({
     body: Joi.object().keys({
-      userId: Joi.string(),
+      userId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
     }),
   }),
   getUser
