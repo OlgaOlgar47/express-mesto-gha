@@ -125,7 +125,10 @@ const createUser = (req, res) => {
     .catch((e) => {
       console.log(e);
       if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).json({ message: e.message });
+        const message = Object.values(e.errors)
+          .map((err) => err.message)
+          .join('; ');
+        res.status(STATUS_BAD_REQUEST).json({ message });
       } else if (e.code === 11000) {
         res
           .status(STATUS_CONFLICT)
