@@ -116,7 +116,7 @@ const createUser = (req, res) => {
         name,
         about,
         avatar,
-      }).select('-password')
+      })
     )
     .then((user) => {
       res.status(201).json({ data: user });
