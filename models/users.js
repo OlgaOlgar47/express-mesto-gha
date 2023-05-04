@@ -4,6 +4,20 @@ const validator = require('validator');
 const { default: isEmail } = require('validator/lib/isEmail');
 
 const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (email) => validator.isEmail(email),
+      message: 'Некорректно введен email',
+    },
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
   name: {
     type: String,
     minlength: 2,
@@ -27,20 +41,6 @@ const userSchema = new mongoose.Schema({
     default:
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: (email) => validator.isEmail(email),
-      message: 'Некорректно введен email',
-    },
-  },
-  password: {
-    type: String,
-    required: true,
-    select: false,
-  },
 });
 
 // eslint-disable-next-line func-names
@@ -49,21 +49,19 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   if (!isEmailValid) {
     return Promise.reject(new Error('Неправильные почта или пароль'));
   }
-  return this.findOne({ email })
-    .select('+password')
-    .then((user) => {
-      if (!user) {
+  return this.findOne({ email }).then((user) => {
+    if (!user) {
+      return Promise.reject(new Error('Неправильные почта или пароль'));
+    }
+
+    return bcrypt.compare(password, user.password).then((matched) => {
+      if (!matched) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
       }
 
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          return Promise.reject(new Error('Неправильные почта или пароль'));
-        }
-
-        return user; // теперь user доступен
-      });
+      return user; // теперь user доступен
     });
+  });
 };
 
 module.exports = mongoose.model('User', userSchema);

@@ -29,6 +29,7 @@ const login = (req, res) => {
   }
 
   User.findUserByCredentials(email, password)
+    .select('+password')
     .then(() => {
       const token = jwt.sign({ _id: 'd285e3dceed844f902650f40' }, SECRET_KEY, {
         expiresIn: '7d',
@@ -38,7 +39,7 @@ const login = (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         sameSite: true,
       }); // httpOnly кука с токеном
-      res.json({ message: 'Login successful!' });
+      res.status(200).json({ message: 'Login successful!' });
     })
     .catch(() => {
       res.status(STATUS_UNAUTHORIZED).json({ message: 'Ошибка авторизации' });
@@ -53,7 +54,7 @@ const getUserMe = (req, res) => {
       if (!user) {
         return res.status(404).json({ message: 'Пользователь не найден' });
       }
-      res.json({ data: user });
+      res.status(200).json({ data: user });
     })
     .catch(() => {
       res.status(500).json({ message: 'Ошибка сервера' });
@@ -63,7 +64,7 @@ const getUserMe = (req, res) => {
 const getUsers = (req, res) => {
   User.find()
     .then((users) => {
-      res.json({ data: users });
+      res.status(200).json({ data: users });
     })
     .catch(() => {
       res
@@ -80,7 +81,7 @@ const getUser = (req, res) => {
       throw new Error('Not found');
     })
     .then((user) => {
-      res.json({ data: user });
+      res.status(200).json({ data: user });
     })
     .catch((e) => {
       if (e.message === 'Not found') {
@@ -97,7 +98,7 @@ const createUser = (req, res) => {
     return;
   }
   // eslint-disable-next-line object-curly-newline
-  const { name, about, avatar, email, password } = req.body;
+  const { email, password, name, about, avatar } = req.body;
 
   if (!email || !password) {
     res.status(
@@ -110,11 +111,11 @@ const createUser = (req, res) => {
     .hash(password, 10)
     .then((hash) =>
       User.create({
+        email,
+        password: hash,
         name,
         about,
         avatar,
-        email,
-        password: hash,
       })
     )
     .then((user) => {
@@ -149,7 +150,7 @@ const updateUser = (req, res) => {
       throw new Error('Not found');
     })
     .then((user) => {
-      res.json({ data: user });
+      res.status(200).json({ data: user });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
@@ -182,7 +183,7 @@ const updateAvatar = (req, res) => {
       throw new Error('Not found');
     })
     .then((user) => {
-      res.json({ data: user });
+      res.status(200).json({ data: user });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
