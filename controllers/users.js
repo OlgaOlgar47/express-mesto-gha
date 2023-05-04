@@ -11,6 +11,7 @@ const {
   STATUS_NOT_FOUND,
   STATUS_INTERNAL_SERVER_ERROR,
   DEFAULT_ERROR_MESSAGE,
+  STATUS_CONFLICT,
 } = require('../config');
 
 const login = (req, res) => {
@@ -127,6 +128,10 @@ const createUser = (req, res) => {
         .join('; ');
       if (e.name === 'ValidationError') {
         res.status(STATUS_BAD_REQUEST).json({ message });
+      } else if (e.code === 11000) {
+        res
+          .status(STATUS_CONFLICT)
+          .json({ message: 'Такой email уже существует' });
       } else {
         res
           .status(STATUS_INTERNAL_SERVER_ERROR)
