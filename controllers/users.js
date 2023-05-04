@@ -123,11 +123,9 @@ const createUser = (req, res) => {
       res.status(201).json({ data: user });
     })
     .catch((e) => {
-      const message = Object.values(e.errors)
-        .map((err) => err.message)
-        .join('; ');
+      console.log(e);
       if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).json({ message });
+        res.status(STATUS_BAD_REQUEST).json({ message: e.message });
       } else if (e.code === 11000) {
         res
           .status(STATUS_CONFLICT)
