@@ -7,6 +7,7 @@ const User = require('../models/users');
 const {
   SECRET_KEY,
   STATUS_BAD_REQUEST,
+  STATUS_CONFLICT,
   STATUS_UNAUTHORIZED,
   STATUS_NOT_FOUND,
   STATUS_INTERNAL_SERVER_ERROR,
@@ -107,19 +108,25 @@ const createUser = (req, res) => {
     return;
   }
 
-  bcrypt
-    .hash(password, 10)
-    .then((hash) =>
-      User.create({
-        email,
-        password: hash,
-        name,
-        about,
-        avatar,
-      })
-    )
-    .then((user) => {
-      res.status(201).json({ data: user });
+  User.findOne({ email })
+    .then((existingUser) => {
+      if (existingUser) {
+        res
+          .status(STATUS_CONFLICT)
+          .json({ message: 'User with this email already exists' });
+        return;
+      }
+      bcrypt.hash(password, 10).then((hash) => {
+        User.create({
+          email,
+          password: hash,
+          name,
+          about,
+          avatar,
+        }).then((user) => {
+          res.status(200).json({ data: user });
+        });
+      });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
