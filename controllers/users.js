@@ -30,8 +30,8 @@ const login = (req, res) => {
   }
 
   User.findUserByCredentials(email, password)
-    .then(() => {
-      const token = jwt.sign({ _id: 'd285e3dceed844f902650f40' }, SECRET_KEY, {
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
         expiresIn: '7d',
       });
       res.cookie('jwt', token, {
@@ -49,8 +49,10 @@ const login = (req, res) => {
 const getUserMe = (req, res) => {
   console.log('work');
   const userId = req.user._id;
+  console.log(req.user._id);
   User.findById(userId)
     .then((user) => {
+      console.log(user);
       if (!user) {
         return res.status(404).json({ message: 'Пользователь не найден' });
       }

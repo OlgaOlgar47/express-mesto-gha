@@ -3,15 +3,14 @@ const { SECRET_KEY, STATUS_UNAUTHORIZED } = require('../config');
 
 // eslint-disable-next-line consistent-return
 const auth = (req, res, next) => {
-  const { authorization } = req.headers;
+  const token = req.cookies.jwt; // Получаем токен из куки
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!token) {
     return res
       .status(STATUS_UNAUTHORIZED)
       .send({ message: 'Необходима авторизация' });
   }
 
-  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
