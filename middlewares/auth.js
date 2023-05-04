@@ -24,7 +24,7 @@ const auth = (req, res, next) => {
 
   req.user = payload; // записываем пейлоуд в объект запроса
 
-  next(); // пропускаем запрос дальше
+  next();
 };
 
 module.exports = auth;
