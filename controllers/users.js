@@ -39,7 +39,7 @@ const login = (req, res) => {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         sameSite: true,
-      }); // httpOnly кука с токеном
+      });
       res.status(200).json({ message: 'Login successful!' });
     })
     .catch(() => {
