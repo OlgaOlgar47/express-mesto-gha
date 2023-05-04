@@ -7,7 +7,6 @@ const User = require('../models/users');
 const {
   SECRET_KEY,
   STATUS_BAD_REQUEST,
-  STATUS_CONFLICT,
   STATUS_UNAUTHORIZED,
   STATUS_NOT_FOUND,
   STATUS_INTERNAL_SERVER_ERROR,
@@ -39,7 +38,7 @@ const login = (req, res) => {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         sameSite: true,
-      });
+      }); // httpOnly кука с токеном
       res.status(200).json({ message: 'Login successful!' });
     })
     .catch(() => {
@@ -108,25 +107,19 @@ const createUser = (req, res) => {
     return;
   }
 
-  User.findOne({ email })
-    .then((existingUser) => {
-      if (existingUser) {
-        res
-          .status(STATUS_CONFLICT)
-          .json({ message: 'User with this email already exists' });
-        return;
-      }
-      bcrypt.hash(password, 10).then((hash) => {
-        User.create({
-          email,
-          password: hash,
-          name,
-          about,
-          avatar,
-        }).then((user) => {
-          res.status(200).json({ data: user });
-        });
-      });
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({
+        email,
+        password: hash,
+        name,
+        about,
+        avatar,
+      }).select('-password')
+    )
+    .then((user) => {
+      res.status(201).json({ data: user });
     })
     .catch((e) => {
       const message = Object.values(e.errors)
