@@ -1,5 +1,6 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 const {
   getCards,
   createCard,
@@ -23,8 +24,34 @@ cardRouter.post(
   }),
   createCard
 );
-cardRouter.delete('/cards/:cardId', deleteCard);
-cardRouter.put('/cards/:cardId/likes', likeCard);
-cardRouter.delete('/cards/:cardId/likes', dislikeCard);
+cardRouter.delete(
+  '/cards/:cardId',
+  celebrate({
+    params: Joi.object().keys({
+      cardId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
+    }),
+  }),
+  deleteCard
+);
+cardRouter.put(
+  '/cards/:cardId/likes',
+  celebrate({
+    params: Joi.object().keys({
+      cardId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
+    }),
+  }),
+  likeCard
+);
+cardRouter.delete(
+  '/cards/:cardId/likes',
+  celebrate({
+    params: Joi.object().keys({
+      cardId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
+    }),
+  }),
+  dislikeCard
+);
+
+cardRouter.use(errors());
 
 module.exports = cardRouter;

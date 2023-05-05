@@ -2,6 +2,7 @@ const Card = require('../models/cards');
 const {
   STATUS_BAD_REQUEST,
   STATUS_NOT_FOUND,
+  STATUS_FORBITTEN,
   STATUS_INTERNAL_SERVER_ERROR,
   DEFAULT_ERROR_MESSAGE,
 } = require('../config');
@@ -50,7 +51,7 @@ const deleteCard = (req, res) => {
     .then((card) => res.json({ deletedData: card }))
     .catch((e) => {
       if (e.message === 'Not allowed') {
-        res.status(STATUS_NOT_FOUND).json({ message: 'Not allowed' });
+        res.status(STATUS_FORBITTEN).json({ message: 'Not allowed' });
       } else {
         res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
       }
