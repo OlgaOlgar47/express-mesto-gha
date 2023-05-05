@@ -45,7 +45,7 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
 
-  Card.findOneAndRemove({ _id: cardId, owner: req.user._id })
+  Card.findOneAndRemove({ _id: cardId })
     .then((card) => {
       if (!card) {
         return res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
