@@ -45,16 +45,14 @@ const deleteCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findOneAndRemove({ _id: cardId, owner: req.user._id })
-    .orFail(() => {
-      throw new Error('Not allowed');
-    })
     .then((card) => {
-      if (card === null) {
+      if (!card) {
         throw new Error('Card not found');
       }
       res.json({ deletedData: card });
     })
     .catch((e) => {
+      console.log(e.message);
       if (e.message === 'Not allowed') {
         res.status(STATUS_FORBITTEN).json({ message: 'Not allowed' });
       } else if (e.message === 'Card not found') {
