@@ -48,10 +48,17 @@ const deleteCard = (req, res) => {
     .orFail(() => {
       throw new Error('Not allowed');
     })
-    .then((card) => res.json({ deletedData: card }))
+    .then((card) => {
+      if (card === null) {
+        throw new Error('Card not found');
+      }
+      res.json({ deletedData: card });
+    })
     .catch((e) => {
       if (e.message === 'Not allowed') {
         res.status(STATUS_FORBITTEN).json({ message: 'Not allowed' });
+      } else if (e.message === 'Card not found') {
+        res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
       } else {
         res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
       }
