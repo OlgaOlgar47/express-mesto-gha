@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const Card = require('../models/cards');
 const {
   STATUS_BAD_REQUEST,
@@ -47,19 +48,15 @@ const deleteCard = (req, res) => {
   Card.findOneAndRemove({ _id: cardId, owner: req.user._id })
     .then((card) => {
       if (!card) {
-        throw new Error('Card not found');
+        return res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
+      }
+      if (card.owner.toString() !== req.user._id) {
+        return res.status(STATUS_FORBITTEN).json({ message: 'Not allowed' });
       }
       res.json({ deletedData: card });
     })
-    .catch((e) => {
-      console.log(e.message);
-      if (e.message === 'Not allowed') {
-        res.status(STATUS_FORBITTEN).json({ message: 'Not allowed' });
-      } else if (e.message === 'Card not found') {
-        res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
-      } else {
-        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
-      }
+    .catch(() => {
+      res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
     });
 };
 
