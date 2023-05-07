@@ -7,22 +7,23 @@ const {
   DEFAULT_ERROR_MESSAGE,
 } = require('../config');
 
-const errorHandler = (err, req, res) => {
-  console.error(err.stack);
+const NotFoundError = require('../utils/errors/NotFoundError');
+const BadRequestError = require('../utils/errors/BadRequestError');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
+const errorHandler = (err, req, res) => {
   if (err.code === 11000) {
     res.status(STATUS_CONFLICT).send({ message: 'Email уже зарегистрирован' });
-  } else if (err.name === 'UnauthorizedError') {
+  } else if (err instanceof UnauthorizedError) {
     res.status(STATUS_UNAUTHORIZED).send({ message: 'Неверный токен' });
-  } else if (err.name === 'ValidationError') {
+  } else if (err instanceof BadRequestError) {
     res.status(STATUS_BAD_REQUEST).send({ message: err.message });
-  } else if (err.name === 'NotFoundError') {
+  } else if (err instanceof NotFoundError) {
     res.status(STATUS_NOT_FOUND).send({ message: 'Не найдено' });
-  } else {
-    res
-      .status(STATUS_INTERNAL_SERVER_ERROR)
-      .send({ message: DEFAULT_ERROR_MESSAGE });
   }
+  res
+    .status(STATUS_INTERNAL_SERVER_ERROR)
+    .json({ message: DEFAULT_ERROR_MESSAGE });
 };
 
 module.exports = errorHandler;

@@ -4,23 +4,18 @@ const {
   STATUS_BAD_REQUEST,
   STATUS_NOT_FOUND,
   STATUS_FORBITTEN,
-  STATUS_INTERNAL_SERVER_ERROR,
   DEFAULT_ERROR_MESSAGE,
 } = require('../config');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({}, { __v: 0 })
     .then((cards) => {
       res.json({ data: cards });
     })
-    .catch(() => {
-      res
-        .status(STATUS_INTERNAL_SERVER_ERROR)
-        .json({ message: DEFAULT_ERROR_MESSAGE });
-    });
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
@@ -28,18 +23,7 @@ const createCard = (req, res) => {
       card.populate('owner');
       res.status(201).json({ data: card });
     })
-    .catch((e) => {
-      const message = Object.values(e.errors)
-        .map((err) => err.message)
-        .join('; ');
-      if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).json({ message });
-      } else {
-        res
-          .status(STATUS_INTERNAL_SERVER_ERROR)
-          .json({ message: DEFAULT_ERROR_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
 const deleteCard = (req, res) => {
