@@ -13,13 +13,13 @@ const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
 const errorHandler = (err, req, res) => {
   if (err.code === 11000) {
-    res.status(STATUS_CONFLICT).send({ message: 'Email уже зарегистрирован' });
+    res.status(STATUS_CONFLICT).send({ message: 'Email is already exist' });
   } else if (err instanceof UnauthorizedError) {
-    res.status(STATUS_UNAUTHORIZED).send({ message: 'Неверный токен' });
+    res.status(STATUS_UNAUTHORIZED).send({ message: 'Access denied' });
   } else if (err instanceof BadRequestError) {
     res.status(STATUS_BAD_REQUEST).send({ message: err.message });
   } else if (err instanceof NotFoundError) {
-    res.status(STATUS_NOT_FOUND).send({ message: 'Не найдено' });
+    res.status(STATUS_NOT_FOUND).send({ message: 'Not found' });
   }
   res
     .status(STATUS_INTERNAL_SERVER_ERROR)

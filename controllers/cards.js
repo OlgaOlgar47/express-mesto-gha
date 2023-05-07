@@ -3,9 +3,10 @@ const Card = require('../models/cards');
 const {
   STATUS_BAD_REQUEST,
   STATUS_NOT_FOUND,
-  STATUS_FORBITTEN,
   DEFAULT_ERROR_MESSAGE,
 } = require('../config');
+const NotFoundError = require('../utils/errors/NotFoundError');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
 const getCards = (req, res, next) => {
   Card.find({}, { __v: 0 })
@@ -26,22 +27,20 @@ const createCard = (req, res, next) => {
     .catch(next);
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findOneAndRemove({ _id: cardId })
     .then((card) => {
       if (!card) {
-        return res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
+        throw new NotFoundError();
       }
       if (card.owner.toString() !== req.user._id) {
-        return res.status(STATUS_FORBITTEN).json({ message: 'Not allowed' });
+        throw new UnauthorizedError();
       }
       res.json({ deletedData: card });
     })
-    .catch(() => {
-      res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
-    });
+    .catch(next);
 };
 
 const likeCard = (req, res) => {
