@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 const {
   STATUS_BAD_REQUEST,
   STATUS_UNAUTHORIZED,
@@ -13,13 +14,17 @@ const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
 const errorHandler = (err, req, res) => {
   if (err.code === 11000) {
-    res.status(STATUS_CONFLICT).send({ message: 'Email is already exist' });
+    res.status(STATUS_CONFLICT).json({ message: 'Email is already exist' });
+    return;
   } else if (err instanceof UnauthorizedError) {
-    res.status(STATUS_UNAUTHORIZED).send({ message: 'Access denied' });
+    res.status(STATUS_UNAUTHORIZED).json({ message: 'Access denied' });
+    return;
   } else if (err instanceof BadRequestError) {
-    res.status(STATUS_BAD_REQUEST).send({ message: err.message });
+    res.status(STATUS_BAD_REQUEST).json({ message: err.message });
+    return;
   } else if (err instanceof NotFoundError) {
-    res.status(STATUS_NOT_FOUND).send({ message: 'Not found' });
+    res.status(STATUS_NOT_FOUND).json({ message: 'Not found' });
+    return;
   }
   res
     .status(STATUS_INTERNAL_SERVER_ERROR)
