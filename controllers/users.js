@@ -121,7 +121,7 @@ const createUser = (req, res, next) => {
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const id = req.user._id;
   const { name, about } = req.body;
   User.findByIdAndUpdate(
@@ -133,24 +133,16 @@ const updateUser = (req, res) => {
     }
   )
     .orFail(() => {
-      throw new Error('Not found');
+      throw new NotFoundError();
     })
     .then((user) => {
       res.status(200).json({ data: user });
     })
     .catch((e) => {
-      const message = Object.values(e.errors)
-        .map((err) => err.message)
-        .join('; ');
-      if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).json({ message: 'User not found' });
-      } else if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).json({ message });
-      } else {
-        res
-          .status(STATUS_INTERNAL_SERVER_ERROR)
-          .json({ message: DEFAULT_ERROR_MESSAGE });
+      if (e.name === 'ValidationError') {
+        next(new BadRequestError());
       }
+      next();
     });
 };
 
