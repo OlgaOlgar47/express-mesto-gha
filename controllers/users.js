@@ -48,7 +48,6 @@ const getUserMe = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .then((user) => {
-      console.log(user);
       if (!user) {
         throw new NotFoundError();
       }
@@ -57,34 +56,26 @@ const getUserMe = (req, res, next) => {
     .catch(next);
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find()
     .then((users) => {
       res.status(200).json({ data: users });
     })
-    .catch(() => {
-      res
-        .status(STATUS_INTERNAL_SERVER_ERROR)
-        .json({ message: DEFAULT_ERROR_MESSAGE });
-    });
+    .catch(next);
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
     .orFail(() => {
-      throw new Error('Not found');
+      throw new NotFoundError();
     })
     .then((user) => {
       res.status(200).json({ data: user });
     })
-    .catch((e) => {
-      if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).json({ message: 'User not found' });
-      } else {
-        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
-      }
+    .catch(() => {
+      next(new BadRequestError());
     });
 };
 
