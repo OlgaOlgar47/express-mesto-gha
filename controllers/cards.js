@@ -24,18 +24,21 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
+
   Card.findById(cardId)
-    .then((card) => {
-      if (card.owner.toString() !== req.user._id) {
-        throw new ForbiddenError();
-      }
-      return Card.findByIdAndRemove(cardId);
-    })
     .then((card) => {
       if (!card) {
         throw new NotFoundError();
       }
-      res.status(200).json({ deletedData: card });
+
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError();
+      }
+
+      return Card.findByIdAndRemove(cardId);
+    })
+    .then((card) => {
+      res.json({ deletedData: card });
     })
     .catch(next);
 };
