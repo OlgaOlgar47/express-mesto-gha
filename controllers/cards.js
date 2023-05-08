@@ -6,7 +6,8 @@ const {
   DEFAULT_ERROR_MESSAGE,
 } = require('../config');
 const NotFoundError = require('../utils/errors/NotFoundError');
-const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+// const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+const ForbittenError = require('../utils/errors/ForbittenError');
 
 const getCards = (req, res, next) => {
   Card.find({}, { __v: 0 })
@@ -36,7 +37,7 @@ const deleteCard = (req, res, next) => {
         throw new NotFoundError();
       }
       if (card.owner.toString() !== req.user._id) {
-        throw new UnauthorizedError();
+        throw new ForbittenError();
       }
       res.json({ deletedData: card });
     })
