@@ -12,7 +12,7 @@ const {
 const NotFoundError = require('../utils/errors/NotFoundError');
 const BadRequestError = require('../utils/errors/BadRequestError');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
-const ForbittenError = require('../utils/errors/ForbittenError');
+const ForbiddenError = require('../utils/errors/ForbiddenError');
 const ConflictError = require('../utils/errors/ConflictError');
 
 // eslint-disable-next-line no-unused-vars
@@ -31,7 +31,7 @@ const errorHandler = (err, req, res, next) => {
   } else if (err instanceof NotFoundError) {
     res.status(STATUS_NOT_FOUND).json({ message: 'Not found' });
     return;
-  } else if (err instanceof ForbittenError) {
+  } else if (err instanceof ForbiddenError) {
     res
       .status(STATUS_FORBITTEN)
       .json({ message: 'You cannot delete others user card' });
