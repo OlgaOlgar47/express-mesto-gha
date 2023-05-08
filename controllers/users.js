@@ -4,13 +4,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
-const {
-  SECRET_KEY,
-  STATUS_BAD_REQUEST,
-  STATUS_NOT_FOUND,
-  STATUS_INTERNAL_SERVER_ERROR,
-  DEFAULT_ERROR_MESSAGE,
-} = require('../config');
+const SECRET_KEY = require('../config');
 const BadRequestError = require('../utils/errors/BadRequestError');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 const NotFoundError = require('../utils/errors/NotFoundError');
@@ -146,7 +140,7 @@ const updateUser = (req, res, next) => {
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const id = req.user._id;
   const { avatar } = req.body;
   User.findByIdAndUpdate(
@@ -158,24 +152,16 @@ const updateAvatar = (req, res) => {
     }
   )
     .orFail(() => {
-      throw new Error('Not found');
+      throw new NotFoundError();
     })
     .then((user) => {
       res.status(200).json({ data: user });
     })
     .catch((e) => {
-      const message = Object.values(e.errors)
-        .map((err) => err.message)
-        .join('; ');
-      if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).json({ message: 'User not found' });
-      } else if (e.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).json({ message });
-      } else {
-        res
-          .status(STATUS_INTERNAL_SERVER_ERROR)
-          .json({ message: DEFAULT_ERROR_MESSAGE });
+      if (e.name === 'ValidationError') {
+        next(new BadRequestError());
       }
+      next();
     });
 };
 
