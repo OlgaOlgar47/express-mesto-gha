@@ -6,21 +6,12 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 const { SECRET_KEY } = require('../config');
 const BadRequestError = require('../utils/errors/BadRequestError');
-const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+// const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 const NotFoundError = require('../utils/errors/NotFoundError');
 const ConflictError = require('../utils/errors/ConflictError');
 
 const login = (req, res, next) => {
-  if (!req.body) {
-    throw new BadRequestError();
-  }
-
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    throw new BadRequestError();
-  }
-
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
@@ -33,9 +24,7 @@ const login = (req, res, next) => {
       }); // httpOnly кука с токеном
       res.status(200).json({ message: 'Login successful!' });
     })
-    .catch(() => {
-      next(new UnauthorizedError());
-    });
+    .catch(next);
 };
 
 const getUserMe = (req, res, next) => {
@@ -80,16 +69,8 @@ const getUser = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  if (!req.body) {
-    throw new BadRequestError();
-  }
   // eslint-disable-next-line object-curly-newline
   const { email, password, name, about, avatar } = req.body;
-
-  if (!email || !password) {
-    throw new BadRequestError();
-  }
-
   bcrypt
     .hash(password, 10)
     .then((hash) =>
@@ -106,11 +87,12 @@ const createUser = (req, res, next) => {
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
-        next(new BadRequestError());
-      } else if (e.code === 11000) {
-        next(new ConflictError());
+        return next(new BadRequestError());
       }
-      next();
+      if (e.code === 11000) {
+        return next(new ConflictError());
+      }
+      next(e);
     });
 };
 
