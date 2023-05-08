@@ -115,9 +115,9 @@ const updateUser = (req, res, next) => {
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
-        next(new BadRequestError());
+        return next(new BadRequestError());
       }
-      next();
+      next(e);
     });
 };
 
@@ -140,9 +140,9 @@ const updateAvatar = (req, res, next) => {
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
-        next(new BadRequestError());
+        return next(new BadRequestError());
       }
-      next();
+      next(e);
     });
 };
 
