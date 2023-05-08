@@ -68,10 +68,10 @@ const getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail(() => {
-      throw new NotFoundError();
-    })
     .then((user) => {
+      if (!user) {
+        throw new NotFoundError();
+      }
       res.status(200).json({ data: user });
     })
     .catch(() => {
