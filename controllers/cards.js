@@ -1,12 +1,6 @@
 /* eslint-disable consistent-return */
 const Card = require('../models/cards');
-const {
-  STATUS_BAD_REQUEST,
-  STATUS_NOT_FOUND,
-  DEFAULT_ERROR_MESSAGE,
-} = require('../config');
 const NotFoundError = require('../utils/errors/NotFoundError');
-// const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 const ForbittenError = require('../utils/errors/ForbittenError');
 
 const getCards = (req, res, next) => {
@@ -44,46 +38,34 @@ const deleteCard = (req, res, next) => {
     .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true }
   )
     .orFail(() => {
-      throw new Error('Not found');
+      throw new NotFoundError();
     })
     .then((card) => {
       res.json({ data: card });
     })
-    .catch((e) => {
-      if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
-      } else {
-        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true }
   )
     .orFail(() => {
-      throw new Error('Not found');
+      throw new NotFoundError();
     })
     .then((card) => {
       res.json({ data: card });
     })
-    .catch((e) => {
-      if (e.message === 'Not found') {
-        res.status(STATUS_NOT_FOUND).json({ message: 'Card not found' });
-      } else {
-        res.status(STATUS_BAD_REQUEST).json({ message: DEFAULT_ERROR_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
 module.exports = {
