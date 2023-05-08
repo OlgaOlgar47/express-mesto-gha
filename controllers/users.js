@@ -10,11 +10,11 @@ const {
   STATUS_NOT_FOUND,
   STATUS_INTERNAL_SERVER_ERROR,
   DEFAULT_ERROR_MESSAGE,
-  STATUS_CONFLICT,
 } = require('../config');
 const BadRequestError = require('../utils/errors/BadRequestError');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 const NotFoundError = require('../utils/errors/NotFoundError');
+const ConflictError = require('../utils/errors/ConflictError');
 
 const login = (req, res, next) => {
   if (!req.body) {
@@ -75,7 +75,6 @@ const getUser = (req, res, next) => {
       res.status(200).json({ data: user });
     })
     .catch((err) => {
-      console.log(err);
       if (err.name === 'CastError') {
         // Если произошла ошибка приведения типов, выбрасываем BadRequestError
         next(new BadRequestError());
@@ -86,19 +85,15 @@ const getUser = (req, res, next) => {
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   if (!req.body) {
-    res.status(STATUS_BAD_REQUEST).json({ message: 'invalid body request' });
-    return;
+    throw new BadRequestError();
   }
   // eslint-disable-next-line object-curly-newline
   const { email, password, name, about, avatar } = req.body;
 
   if (!email || !password) {
-    res.status(
-      STATUS_BAD_REQUEST.json({ message: 'email or password is required' })
-    );
-    return;
+    throw new BadRequestError();
   }
 
   bcrypt
@@ -118,19 +113,11 @@ const createUser = (req, res) => {
     .catch((e) => {
       console.log(e);
       if (e.name === 'ValidationError') {
-        const message = Object.values(e.errors)
-          .map((err) => err.message)
-          .join('; ');
-        res.status(STATUS_BAD_REQUEST).json({ message });
+        next(new BadRequestError());
       } else if (e.code === 11000) {
-        res
-          .status(STATUS_CONFLICT)
-          .json({ message: 'Такой email уже существует' });
-      } else {
-        res
-          .status(STATUS_INTERNAL_SERVER_ERROR)
-          .json({ message: DEFAULT_ERROR_MESSAGE });
+        next(new ConflictError());
       }
+      next();
     });
 };
 
