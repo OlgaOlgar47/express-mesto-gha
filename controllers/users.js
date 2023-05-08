@@ -4,7 +4,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
-const SECRET_KEY = require('../config');
+const { SECRET_KEY } = require('../config');
 const BadRequestError = require('../utils/errors/BadRequestError');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 const NotFoundError = require('../utils/errors/NotFoundError');
@@ -23,6 +23,7 @@ const login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
+      console.log(user);
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
         expiresIn: '7d',
       });
@@ -33,7 +34,8 @@ const login = (req, res, next) => {
       }); // httpOnly кука с токеном
       res.status(200).json({ message: 'Login successful!' });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       next(new UnauthorizedError());
     });
 };
