@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 const Card = require('../models/cards');
 const NotFoundError = require('../utils/errors/NotFoundError');
-const ForbittenError = require('../utils/errors/ForbittenError');
+const ForbiddenError = require('../utils/errors/ForbiddenError');
 
 const getCards = (req, res, next) => {
   Card.find({}, { __v: 0 })
@@ -14,9 +14,9 @@ const getCards = (req, res, next) => {
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
 
-  Card.create({ name, link, owner: req.user._id })
+  return Card.create({ name, link, owner: req.user._id })
+    .then((card) => card.populate('owner'))
     .then((card) => {
-      card.populate('owner');
       res.status(201).json({ data: card });
     })
     .catch(next);
@@ -24,16 +24,18 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-
-  Card.findOneAndRemove({ _id: cardId })
+  Card.findById(cardId)
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError();
+      }
+      return Card.findByIdAndRemove(cardId);
+    })
     .then((card) => {
       if (!card) {
         throw new NotFoundError();
       }
-      if (card.owner.toString() !== req.user._id) {
-        throw new ForbittenError();
-      }
-      res.json({ deletedData: card });
+      res.status(200).json({ deletedData: card });
     })
     .catch(next);
 };
