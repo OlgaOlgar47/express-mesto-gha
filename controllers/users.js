@@ -14,6 +14,7 @@ const {
 } = require('../config');
 const BadRequestError = require('../utils/errors/BadRequestError');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+const NotFoundError = require('../utils/errors/NotFoundError');
 
 const login = (req, res, next) => {
   if (!req.body) {
@@ -43,21 +44,17 @@ const login = (req, res, next) => {
     });
 };
 
-const getUserMe = (req, res) => {
-  console.log('work');
+const getUserMe = (req, res, next) => {
   const userId = req.user._id;
-  console.log(req.user._id);
   User.findById(userId)
     .then((user) => {
       console.log(user);
       if (!user) {
-        return res.status(404).json({ message: 'Пользователь не найден' });
+        throw new NotFoundError();
       }
       res.status(200).json({ data: user });
     })
-    .catch(() => {
-      res.status(500).json({ message: 'Ошибка сервера' });
-    });
+    .catch(next);
 };
 
 const getUsers = (req, res) => {
