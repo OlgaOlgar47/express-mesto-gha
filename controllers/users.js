@@ -7,29 +7,29 @@ const User = require('../models/users');
 const {
   SECRET_KEY,
   STATUS_BAD_REQUEST,
-  STATUS_UNAUTHORIZED,
   STATUS_NOT_FOUND,
   STATUS_INTERNAL_SERVER_ERROR,
   DEFAULT_ERROR_MESSAGE,
   STATUS_CONFLICT,
 } = require('../config');
+const BadRequestError = require('../utils/errors/BadRequestError');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   if (!req.body) {
-    res.status(STATUS_BAD_REQUEST).json({ message: 'invalid body request' });
-    return;
+    throw new BadRequestError();
   }
 
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(
-      STATUS_BAD_REQUEST.json({ message: 'email or password is required' })
-    );
-    return;
+    throw new BadRequestError();
   }
 
   User.findUserByCredentials(email, password)
+    .orFail(() => {
+      throw new UnauthorizedError();
+    })
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
         expiresIn: '7d',
@@ -41,9 +41,7 @@ const login = (req, res) => {
       }); // httpOnly кука с токеном
       res.status(200).json({ message: 'Login successful!' });
     })
-    .catch(() => {
-      res.status(STATUS_UNAUTHORIZED).json({ message: 'Ошибка авторизации' });
-    });
+    .catch(next);
 };
 
 const getUserMe = (req, res) => {
