@@ -1,7 +1,9 @@
+const STATUS_FORBITTEN = require('../../config');
+
 class ForbittenError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = 403;
+    this.statusCode = { STATUS_FORBITTEN };
   }
 }
 

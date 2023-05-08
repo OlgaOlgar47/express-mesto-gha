@@ -1,7 +1,9 @@
+const STATUS_BAD_REQUEST = require('../../config');
+
 class BadRequestError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = 400;
+    this.statusCode = { STATUS_BAD_REQUEST };
   }
 }
 
