@@ -23,7 +23,6 @@ const login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      console.log(user);
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
         expiresIn: '7d',
       });
@@ -34,8 +33,7 @@ const login = (req, res, next) => {
       }); // httpOnly кука с токеном
       res.status(200).json({ message: 'Login successful!' });
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
       next(new UnauthorizedError());
     });
 };
@@ -107,7 +105,6 @@ const createUser = (req, res, next) => {
       res.status(201).json({ data: user });
     })
     .catch((e) => {
-      console.log(e);
       if (e.name === 'ValidationError') {
         next(new BadRequestError());
       } else if (e.code === 11000) {

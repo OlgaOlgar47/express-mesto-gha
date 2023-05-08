@@ -17,7 +17,6 @@ const ConflictError = require('../utils/errors/ConflictError');
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
-  console.log('work!');
   if (err instanceof ConflictError) {
     res.status(STATUS_CONFLICT).json({ message: 'Email is already exist' });
     return;
