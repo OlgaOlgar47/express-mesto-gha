@@ -16,6 +16,7 @@ const ForbittenError = require('../utils/errors/ForbittenError');
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
+  console.log('work!');
   if (err.code === 11000) {
     res.status(STATUS_CONFLICT).json({ message: 'Email is already exist' });
     return;

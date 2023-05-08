@@ -74,8 +74,15 @@ const getUser = (req, res, next) => {
       }
       res.status(200).json({ data: user });
     })
-    .catch(() => {
-      next(new BadRequestError());
+    .catch((err) => {
+      console.log(err);
+      if (err.name === 'CastError') {
+        // Если произошла ошибка приведения типов, выбрасываем BadRequestError
+        next(new BadRequestError());
+      } else {
+        // В противном случае передаем ошибку дальше
+        next(err);
+      }
     });
 };
 
