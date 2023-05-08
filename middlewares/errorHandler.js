@@ -20,7 +20,9 @@ const errorHandler = (err, req, res, next) => {
     res.status(STATUS_CONFLICT).json({ message: 'Email is already exist' });
     return;
   } else if (err instanceof UnauthorizedError) {
-    res.status(STATUS_UNAUTHORIZED).json({ message: 'Access denied' });
+    res
+      .status(STATUS_UNAUTHORIZED)
+      .json({ message: 'Неправильные почта или пароль' });
     return;
   } else if (err instanceof BadRequestError) {
     res.status(STATUS_BAD_REQUEST).json({ message: err.message });

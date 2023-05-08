@@ -27,9 +27,6 @@ const login = (req, res, next) => {
   }
 
   User.findUserByCredentials(email, password)
-    .orFail(() => {
-      throw new UnauthorizedError();
-    })
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
         expiresIn: '7d',
@@ -41,7 +38,9 @@ const login = (req, res, next) => {
       }); // httpOnly кука с токеном
       res.status(200).json({ message: 'Login successful!' });
     })
-    .catch(next);
+    .catch(() => {
+      next(new UnauthorizedError());
+    });
 };
 
 const getUserMe = (req, res) => {
