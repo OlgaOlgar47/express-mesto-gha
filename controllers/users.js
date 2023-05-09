@@ -34,7 +34,7 @@ const getUserMe = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError();
+        throw new NotFoundError('User not found');
       }
       res.status(200).json({ data: user });
     })
@@ -55,14 +55,14 @@ const getUser = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError();
+        throw new NotFoundError('User not found');
       }
       res.status(200).json({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         // Если произошла ошибка приведения типов, выбрасываем BadRequestError
-        next(new BadRequestError());
+        next(new BadRequestError(err.message));
       } else {
         // В противном случае передаем ошибку дальше
         next(err);
@@ -89,7 +89,7 @@ const createUser = (req, res, next) => {
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
-        return next(new BadRequestError());
+        return next(new BadRequestError(e.message));
       } else if (e.code === 11000) {
         return next(new ConflictError('Такой email уже зарегистрирован'));
       } else {
@@ -110,14 +110,14 @@ const updateUser = (req, res, next) => {
     }
   )
     .orFail(() => {
-      throw new NotFoundError();
+      throw new NotFoundError('User not found');
     })
     .then((user) => {
       res.status(200).json({ data: user });
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
-        return next(new BadRequestError());
+        return next(new BadRequestError(e.message));
       }
       next(e);
     });
@@ -135,14 +135,14 @@ const updateAvatar = (req, res, next) => {
     }
   )
     .orFail(() => {
-      throw new NotFoundError();
+      throw new NotFoundError('User not found');
     })
     .then((user) => {
       res.status(200).json({ data: user });
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
-        return next(new BadRequestError());
+        return next(new BadRequestError(e.message));
       }
       next(e);
     });

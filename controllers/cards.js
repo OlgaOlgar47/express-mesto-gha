@@ -28,10 +28,10 @@ const deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError();
+        throw new NotFoundError('Card not found');
       }
       if (card.owner.toString() !== req.user._id) {
-        throw new ForbiddenError();
+        throw new ForbiddenError('Cannot delete card of other user');
       }
       return Card.findByIdAndRemove(cardId);
     })
@@ -48,7 +48,7 @@ const likeCard = (req, res, next) => {
     { new: true }
   )
     .orFail(() => {
-      throw new NotFoundError();
+      throw new NotFoundError('Card not found');
     })
     .then((card) => {
       res.json({ data: card });
@@ -63,7 +63,7 @@ const dislikeCard = (req, res, next) => {
     { new: true }
   )
     .orFail(() => {
-      throw new NotFoundError();
+      throw new NotFoundError('Card not found');
     })
     .then((card) => {
       res.json({ data: card });
