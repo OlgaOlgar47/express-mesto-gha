@@ -1,6 +1,5 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const { errors } = require('celebrate');
 const {
   getCards,
   createCard,
@@ -16,7 +15,7 @@ cardRouter.post(
   '/cards',
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().required().min(2).max(8),
+      name: Joi.string().required().min(2).max(30),
       link: Joi.string()
         .required()
         .pattern(/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?#?$/),
@@ -51,7 +50,5 @@ cardRouter.delete(
   }),
   dislikeCard
 );
-
-cardRouter.use(errors());
 
 module.exports = cardRouter;

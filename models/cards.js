@@ -9,6 +9,12 @@ const cardSchema = new mongoose.Schema({
   },
   link: {
     type: String,
+    validate: {
+      validator(v) {
+        return /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?#?$/.test(v);
+      },
+      message: 'Некорректно введена ссылка',
+    },
     required: true,
   },
   owner: {

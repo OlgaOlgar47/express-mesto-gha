@@ -1,6 +1,5 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const { errors } = require('celebrate');
 
 const {
   getUserMe,
@@ -37,14 +36,12 @@ userRouter.patch(
   '/users/me/avatar',
   celebrate({
     body: Joi.object().keys({
-      avatar: Joi.string().pattern(
-        /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?#?$/
-      ),
+      avatar: Joi.string()
+        .required()
+        .pattern(/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?#?$/),
     }),
   }),
   updateAvatar
 );
-
-userRouter.use(errors());
 
 module.exports = userRouter;
