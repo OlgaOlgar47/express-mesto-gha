@@ -1,14 +1,13 @@
 const jwt = require('jsonwebtoken');
-const { SECRET_KEY, STATUS_UNAUTHORIZED } = require('../config');
+const { SECRET_KEY } = require('../config');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
 // eslint-disable-next-line consistent-return
 const auth = (req, res, next) => {
   const token = req.cookies.jwt; // Получаем токен из куки
 
   if (!token) {
-    return res
-      .status(STATUS_UNAUTHORIZED)
-      .send({ message: 'Необходима авторизация' });
+    throw new UnauthorizedError('Необходима авторизация');
   }
 
   let payload;
@@ -16,9 +15,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, SECRET_KEY);
   } catch (err) {
-    return res
-      .status(STATUS_UNAUTHORIZED)
-      .send({ message: 'Необходима авторизация' });
+    return Promise.reject(new UnauthorizedError('Необходима авторизация'));
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса

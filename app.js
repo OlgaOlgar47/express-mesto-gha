@@ -46,7 +46,6 @@ app.post(
   }),
   createUser
 );
-app.use(errors());
 
 app.use(auth, userRouter);
 app.use(auth, cardRouter);
