@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 /* eslint-disable consistent-return */
 /* eslint-disable function-paren-newline */
 /* eslint-disable implicit-arrow-linebreak */
@@ -88,11 +89,11 @@ const createUser = (req, res, next) => {
     .catch((e) => {
       if (e.name === 'ValidationError') {
         return next(new BadRequestError());
-      }
-      if (e.code === 11000) {
+      } else if (e.code === 11000) {
         return next(new ConflictError());
+      } else {
+        return next(e);
       }
-      next(e);
     });
 };
 
