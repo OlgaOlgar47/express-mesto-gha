@@ -3,6 +3,7 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable implicit-arrow-linebreak */
 const bcrypt = require('bcryptjs');
+// const MongoServerError = require('mongoose').Error;
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 const { SECRET_KEY } = require('../config');
@@ -90,7 +91,7 @@ const createUser = (req, res, next) => {
       if (e.name === 'ValidationError') {
         return next(new BadRequestError());
       } else if (e.code === 11000) {
-        return next(new ConflictError());
+        return next(new ConflictError('Такой email уже зарегистрирован'));
       } else {
         return next(e);
       }

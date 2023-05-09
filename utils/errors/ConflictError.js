@@ -1,4 +1,4 @@
-const STATUS_CONFLICT = require('../../config');
+const { STATUS_CONFLICT } = require('../../config');
 
 class ConflictError extends Error {
   constructor(message) {

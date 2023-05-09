@@ -5,14 +5,15 @@ const {
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
-  const { statusCode = STATUS_INTERNAL_SERVER_ERROR } = err;
-  // eslint-disable-next-line operator-linebreak
-  const myMessage =
-    statusCode === STATUS_INTERNAL_SERVER_ERROR
-      ? DEFAULT_ERROR_MESSAGE
-      : err.message;
-
-  res.status(statusCode).json({ message: myMessage });
+  // если у ошибки нет статуса, выставляем 500
+  const { statusCode = STATUS_INTERNAL_SERVER_ERROR, message } = err;
+  res.status(statusCode).send({
+    // проверяем статус и выставляем сообщение в зависимости от него
+    message:
+      statusCode === STATUS_INTERNAL_SERVER_ERROR
+        ? DEFAULT_ERROR_MESSAGE
+        : message,
+  });
 };
 
 module.exports = errorHandler;

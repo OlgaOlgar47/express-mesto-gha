@@ -1,4 +1,4 @@
-const STATUS_FORBITTEN = require('../../config');
+const { STATUS_FORBITTEN } = require('../../config');
 
 class ForbiddenError extends Error {
   constructor(message) {
